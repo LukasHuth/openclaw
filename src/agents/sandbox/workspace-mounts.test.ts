@@ -6,6 +6,10 @@ describe("appendWorkspaceMountArgs", () => {
     { access: "rw" as const, expected: "/tmp/workspace:/workspace:z" },
     { access: "ro" as const, expected: "/tmp/workspace:/workspace:ro,z" },
     { access: "none" as const, expected: "/tmp/workspace:/workspace:ro,z" },
+    {
+      access: "volume" as const,
+      expected: "type=volume,source=openclaw-sandbox-workspace,target=/workspace",
+    },
   ])("sets main mount permissions for workspaceAccess=$access", ({ access, expected }) => {
     const args: string[] = [];
     appendWorkspaceMountArgs({
@@ -59,5 +63,22 @@ describe("appendWorkspaceMountArgs", () => {
 
     const mounts = args.filter((arg) => arg.startsWith("/tmp/"));
     expect(mounts).toEqual(["/tmp/workspace:/workspace:ro,z", "/tmp/agent-workspace:/agent:ro,z"]);
+  });
+
+  it("uses configured docker named volume for workspaceAccess volume", () => {
+    const args: string[] = [];
+    appendWorkspaceMountArgs({
+      args,
+      workspaceDir: "/tmp/workspace",
+      agentWorkspaceDir: "/tmp/agent-workspace",
+      workdir: "/workspace",
+      workspaceAccess: "volume",
+      workspaceVolume: "openclaw-volume-workspace",
+    });
+
+    expect(args).toEqual([
+      "--mount",
+      "type=volume,source=openclaw-volume-workspace,target=/workspace",
+    ]);
   });
 });

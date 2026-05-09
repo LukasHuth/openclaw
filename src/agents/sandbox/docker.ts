@@ -523,6 +523,10 @@ async function createSandboxContainer(params: {
     agentWorkspaceDir: params.agentWorkspaceDir,
     workdir: cfg.workdir,
     workspaceAccess: params.workspaceAccess,
+    workspaceVolume:
+      params.workspaceAccess === "volume"
+        ? cfg.workspaceVolume?.trim() || `${name}-workspace`
+        : undefined,
   });
   appendCustomBinds(args, cfg);
   args.push(cfg.image, "sleep", "infinity");

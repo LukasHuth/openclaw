@@ -457,6 +457,14 @@ export const FIELD_HELP: Record<string, string> = {
     'Optional Docker GPU passthrough value passed to --gpus, for example "all" or "device=GPU-uuid". Requires a compatible host runtime such as NVIDIA Container Toolkit.',
   "agents.list[].sandbox.docker.gpus":
     "Per-agent Docker GPU passthrough override for sandbox containers.",
+  "agents.defaults.sandbox.docker.workspaceVolume":
+    'Optional Docker named volume for `sandbox.workspaceAccess: "volume"` main workspace mounts. Defaults to `<container-name>-workspace` when omitted.',
+  "agents.defaults.sandbox.docker.workspace-volume":
+    "Deprecated alias for `agents.defaults.sandbox.docker.workspaceVolume`.",
+  "agents.list[].sandbox.docker.workspaceVolume":
+    'Per-agent Docker named volume override for `sandbox.workspaceAccess: "volume"` workspace mounts.',
+  "agents.list[].sandbox.docker.workspace-volume":
+    "Deprecated per-agent alias for `agents.list[].sandbox.docker.workspaceVolume`.",
   "agents.defaults.sandbox.browser.cdpSourceRange":
     "Optional CIDR allowlist for container-edge CDP ingress (for example 172.21.0.1/32).",
   "agents.list[].sandbox.browser.cdpSourceRange":

@@ -42,7 +42,10 @@ async function ensureSandboxWorkspaceLayout(params: {
   const scopeKey = resolveSandboxScopeKey(cfg.scope, rawSessionKey);
   const sandboxWorkspaceDir =
     cfg.scope === "shared" ? workspaceRoot : resolveSandboxWorkspaceDir(workspaceRoot, scopeKey);
-  const workspaceDir = cfg.workspaceAccess === "rw" ? agentWorkspaceDir : sandboxWorkspaceDir;
+  const workspaceDir =
+    cfg.workspaceAccess === "rw" || cfg.workspaceAccess === "volume"
+      ? agentWorkspaceDir
+      : sandboxWorkspaceDir;
 
   if (workspaceDir === sandboxWorkspaceDir) {
     await ensureSandboxWorkspace(
@@ -51,7 +54,7 @@ async function ensureSandboxWorkspaceLayout(params: {
       params.config?.agents?.defaults?.skipBootstrap,
       params.config?.agents?.defaults?.skipOptionalBootstrapFiles,
     );
-    if (cfg.workspaceAccess !== "rw") {
+    if (cfg.workspaceAccess !== "rw" && cfg.workspaceAccess !== "volume") {
       try {
         const [{ getRemoteSkillEligibility }, { canExecRequestNode }, { syncSkillsToWorkspace }] =
           await Promise.all([

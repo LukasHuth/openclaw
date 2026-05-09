@@ -709,7 +709,7 @@ export async function runMemoryFlushIfNeeded(params: {
       return true;
     }
     const sandboxCfg = resolveSandboxConfigForAgent(params.cfg, runtime.agentId);
-    return sandboxCfg.workspaceAccess === "rw";
+    return sandboxCfg.workspaceAccess === "rw" || sandboxCfg.workspaceAccess === "volume";
   })();
 
   const isCli = isCliProvider(params.followupRun.run.provider, params.cfg);

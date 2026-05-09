@@ -15,7 +15,7 @@ export type ExecFilesystemPolicyDriftHit = {
   runtimeTools: string[];
   disabledFilesystemTools: string[];
   sandboxMode: "off" | "non-main" | "all";
-  sandboxWorkspaceAccess: "none" | "ro" | "rw";
+  sandboxWorkspaceAccess: "none" | "ro" | "rw" | "volume";
   execHost: NonNullable<ExecToolConfig["host"]>;
 };
 
@@ -58,7 +58,7 @@ function resolveExecHost(params: {
 
 function isExecFilesystemConstrained(params: {
   sandboxMode: "off" | "non-main" | "all";
-  sandboxWorkspaceAccess: "none" | "ro" | "rw";
+  sandboxWorkspaceAccess: "none" | "ro" | "rw" | "volume";
   execHost: NonNullable<ExecToolConfig["host"]>;
 }): boolean {
   if (params.sandboxMode !== "all") {
@@ -67,7 +67,7 @@ function isExecFilesystemConstrained(params: {
   if (params.execHost === "gateway" || params.execHost === "node") {
     return false;
   }
-  return params.sandboxWorkspaceAccess !== "rw";
+  return params.sandboxWorkspaceAccess !== "rw" && params.sandboxWorkspaceAccess !== "volume";
 }
 
 export function collectExecFilesystemPolicyDriftHits(

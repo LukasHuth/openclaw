@@ -293,6 +293,9 @@ For `mirror` mode, recreate mainly resets the remote execution environment becau
   <Tab title="rw">
     Mounts the agent workspace read/write at `/workspace`.
   </Tab>
+  <Tab title="volume">
+    Mounts a Docker named volume at `/workspace` (no host workspace bind mount).
+  </Tab>
 </Tabs>
 
 With the OpenShell backend:
@@ -306,6 +309,8 @@ Inbound media is copied into the active sandbox workspace (`media/inbound/*`).
 <Note>
 **Skills note:** the `read` tool is sandbox-rooted. With `workspaceAccess: "none"`, OpenClaw mirrors eligible skills into the sandbox workspace (`.../skills`) so they can be read. With `"rw"`, workspace skills are readable from `/workspace/skills`.
 </Note>
+
+For Docker `workspaceAccess: "volume"`, set `agents.defaults.sandbox.docker.workspaceVolume` (or per-agent `agents.list[].sandbox.docker.workspaceVolume`) to choose the volume name. The legacy alias `workspace-volume` is also accepted. When omitted, OpenClaw uses `<container-name>-workspace`.
 
 ## Custom bind mounts
 

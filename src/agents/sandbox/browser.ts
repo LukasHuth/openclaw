@@ -178,6 +178,7 @@ export async function ensureSandboxBrowser(params: {
   const slug = params.cfg.scope === "shared" ? "shared" : slugifySessionKey(params.scopeKey);
   const name = `${params.cfg.browser.containerPrefix}${slug}`;
   const containerName = name.slice(0, 63);
+  const mainSandboxContainerName = `${params.cfg.docker.containerPrefix}${slug}`.slice(0, 63);
   const state = await dockerContainerState(containerName);
   const browserImage = params.cfg.browser.image ?? DEFAULT_SANDBOX_BROWSER_IMAGE;
   const cdpSourceRange = normalizeOptionalString(params.cfg.browser.cdpSourceRange);
@@ -305,6 +306,10 @@ export async function ensureSandboxBrowser(params: {
       agentWorkspaceDir: params.agentWorkspaceDir,
       workdir: params.cfg.docker.workdir,
       workspaceAccess: params.cfg.workspaceAccess,
+      workspaceVolume:
+        params.cfg.workspaceAccess === "volume"
+          ? params.cfg.docker.workspaceVolume?.trim() || `${mainSandboxContainerName}-workspace`
+          : undefined,
     });
     if (browserDockerCfg.binds?.length) {
       for (const bind of browserDockerCfg.binds) {

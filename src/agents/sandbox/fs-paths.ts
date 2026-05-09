@@ -65,7 +65,7 @@ export function buildSandboxFsMounts(sandbox: SandboxFsBridgeContext): SandboxFs
     {
       hostRoot: path.resolve(sandbox.workspaceDir),
       containerRoot: normalizeContainerPath(sandbox.containerWorkdir),
-      writable: sandbox.workspaceAccess === "rw",
+      writable: sandbox.workspaceAccess === "rw" || sandbox.workspaceAccess === "volume",
       source: "workspace",
     },
   ];
@@ -77,7 +77,7 @@ export function buildSandboxFsMounts(sandbox: SandboxFsBridgeContext): SandboxFs
     mounts.push({
       hostRoot: path.resolve(sandbox.agentWorkspaceDir),
       containerRoot: SANDBOX_AGENT_WORKSPACE_MOUNT,
-      writable: sandbox.workspaceAccess === "rw",
+      writable: sandbox.workspaceAccess === "rw" || sandbox.workspaceAccess === "volume",
       source: "agent",
     });
   }

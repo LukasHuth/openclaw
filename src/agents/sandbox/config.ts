@@ -97,6 +97,14 @@ export function resolveSandboxDockerConfig(params: {
     : globalDocker?.ulimits;
 
   const binds = [...(globalDocker?.binds ?? []), ...(agentDocker?.binds ?? [])];
+  const agentWorkspaceVolume = normalizeOptionalString(
+    agentDocker?.workspaceVolume ??
+      (agentDocker as { "workspace-volume"?: string } | undefined)?.["workspace-volume"],
+  );
+  const globalWorkspaceVolume = normalizeOptionalString(
+    globalDocker?.workspaceVolume ??
+      (globalDocker as { "workspace-volume"?: string } | undefined)?.["workspace-volume"],
+  );
 
   return {
     image: agentDocker?.image ?? globalDocker?.image ?? DEFAULT_SANDBOX_IMAGE,
@@ -105,6 +113,7 @@ export function resolveSandboxDockerConfig(params: {
       globalDocker?.containerPrefix ??
       DEFAULT_SANDBOX_CONTAINER_PREFIX,
     workdir: agentDocker?.workdir ?? globalDocker?.workdir ?? DEFAULT_SANDBOX_WORKDIR,
+    workspaceVolume: agentWorkspaceVolume ?? globalWorkspaceVolume,
     readOnlyRoot: agentDocker?.readOnlyRoot ?? globalDocker?.readOnlyRoot ?? true,
     tmpfs: agentDocker?.tmpfs ?? globalDocker?.tmpfs ?? ["/tmp", "/var/tmp", "/run"],
     network: agentDocker?.network ?? globalDocker?.network ?? "none",

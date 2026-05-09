@@ -17,8 +17,16 @@ export function appendWorkspaceMountArgs(params: {
   agentWorkspaceDir: string;
   workdir: string;
   workspaceAccess: SandboxWorkspaceAccess;
+  workspaceVolume?: string;
 }) {
-  const { args, workspaceDir, agentWorkspaceDir, workdir, workspaceAccess } = params;
+  const { args, workspaceDir, agentWorkspaceDir, workdir, workspaceAccess, workspaceVolume } =
+    params;
+
+  if (workspaceAccess === "volume") {
+    const volumeName = workspaceVolume?.trim() || "openclaw-sandbox-workspace";
+    args.push("--mount", `type=volume,source=${volumeName},target=${workdir}`);
+    return;
+  }
 
   args.push(
     "-v",

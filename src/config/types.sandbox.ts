@@ -7,6 +7,10 @@ export type SandboxDockerSettings = {
   containerPrefix?: string;
   /** Container workdir mount path (default: /workspace). */
   workdir?: string;
+  /** Docker named volume for `workspaceAccess: "volume"` mounts (defaults to `<container>-workspace`). */
+  workspaceVolume?: string;
+  /** @deprecated Use workspaceVolume. */
+  "workspace-volume"?: string;
   /** Run container rootfs read-only. */
   readOnlyRoot?: boolean;
   /** Extra tmpfs mounts for read-only containers. */

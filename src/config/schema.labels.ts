@@ -661,6 +661,8 @@ export const FIELD_LABELS: Record<string, string> = {
   "agents.defaults.sandbox.docker.dangerouslyAllowContainerNamespaceJoin":
     "Sandbox Docker Allow Container Namespace Join",
   "agents.defaults.sandbox.docker.gpus": "Sandbox Docker GPUs",
+  "agents.defaults.sandbox.docker.workspaceVolume": "Sandbox Docker Workspace Volume",
+  "agents.defaults.sandbox.docker.workspace-volume": "Sandbox Docker Workspace Volume (Legacy)",
   commands: "Commands",
   "commands.native": "Native Commands",
   "commands.nativeSkills": "Native Skill Commands",
@@ -922,6 +924,8 @@ export const FIELD_LABELS: Record<string, string> = {
   "agents.list[].sandbox.docker.dangerouslyAllowContainerNamespaceJoin":
     "Agent Sandbox Docker Allow Container Namespace Join",
   "agents.list[].sandbox.docker.gpus": "Agent Sandbox Docker GPUs",
+  "agents.list[].sandbox.docker.workspaceVolume": "Agent Sandbox Docker Workspace Volume",
+  "agents.list[].sandbox.docker.workspace-volume": "Agent Sandbox Docker Workspace Volume (Legacy)",
   "discovery.mdns.mode": "mDNS Discovery Mode",
   plugins: "Plugins",
   "plugins.enabled": "Enable Plugins",

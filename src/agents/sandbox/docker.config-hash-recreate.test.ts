@@ -110,7 +110,7 @@ async function loadFreshDockerModuleForTest() {
 function createSandboxConfig(
   dns: string[],
   binds?: string[],
-  workspaceAccess: "rw" | "ro" | "none" = "rw",
+  workspaceAccess: "rw" | "ro" | "none" | "volume" = "rw",
 ): SandboxConfig {
   return {
     mode: "all",
@@ -286,6 +286,10 @@ describe("ensureSandboxContainer config-hash recreation", () => {
     { workspaceAccess: "rw" as const, expectedMainMount: "/tmp/workspace:/workspace:z" },
     { workspaceAccess: "ro" as const, expectedMainMount: "/tmp/workspace:/workspace:ro,z" },
     { workspaceAccess: "none" as const, expectedMainMount: "/tmp/workspace:/workspace:ro,z" },
+    {
+      workspaceAccess: "volume" as const,
+      expectedMainMount: "type=volume,source=oc-test-shared-workspace,target=/workspace",
+    },
   ])(
     "uses expected main mount permissions when workspaceAccess=$workspaceAccess",
     async ({ workspaceAccess, expectedMainMount }) => {
@@ -299,6 +303,11 @@ describe("ensureSandboxContainer config-hash recreation", () => {
 
       const createCall = await ensureSandboxCreateCallForTest({ cfg, workspaceDir });
 
+      if (workspaceAccess === "volume") {
+        const mountArgs = collectDockerFlagValues(createCall.args, "--mount");
+        expect(mountArgs).toContain(expectedMainMount);
+        return;
+      }
       const bindArgs = collectDockerFlagValues(createCall.args, "-v");
       expect(bindArgs).toContain(expectedMainMount);
     },

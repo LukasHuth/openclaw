@@ -131,6 +131,64 @@ describe("sandbox docker config", () => {
     expect(res.ok).toBe(false);
   });
 
+  it("accepts workspace volume config for sandbox volume workspace access", () => {
+    const res = validateConfigObject({
+      agents: {
+        defaults: {
+          sandbox: {
+            workspaceAccess: "volume",
+            docker: {
+              workspaceVolume: "openclaw-main-workspace",
+            },
+          },
+        },
+      },
+    });
+    expect(res.ok).toBe(true);
+    if (res.ok) {
+      expect(res.config.agents?.defaults?.sandbox?.workspaceAccess).toBe("volume");
+      expect(res.config.agents?.defaults?.sandbox?.docker?.workspaceVolume).toBe(
+        "openclaw-main-workspace",
+      );
+    }
+  });
+
+  it("accepts legacy workspace-volume alias for sandbox volume workspace access", () => {
+    const res = validateConfigObject({
+      agents: {
+        defaults: {
+          sandbox: {
+            workspaceAccess: "volume",
+            docker: {
+              "workspace-volume": "openclaw-main-workspace-legacy",
+            },
+          },
+        },
+      },
+    });
+    expect(res.ok).toBe(true);
+    if (res.ok) {
+      expect(res.config.agents?.defaults?.sandbox?.workspaceAccess).toBe("volume");
+      expect(res.config.agents?.defaults?.sandbox?.docker?.workspaceVolume).toBeUndefined();
+      expect(
+        (
+          res.config.agents?.defaults?.sandbox?.docker as
+            | { "workspace-volume"?: string }
+            | undefined
+        )?.["workspace-volume"],
+      ).toBe("openclaw-main-workspace-legacy");
+    }
+  });
+
+  it("resolves legacy workspace-volume alias when building docker sandbox config", () => {
+    const resolved = resolveSandboxDockerConfig({
+      scope: "agent",
+      globalDocker: { "workspace-volume": "openclaw-legacy-volume" },
+      agentDocker: {},
+    });
+    expect(resolved.workspaceVolume).toBe("openclaw-legacy-volume");
+  });
+
   it("rejects network host mode via Zod schema validation", () => {
     const res = validateConfigObject({
       agents: {

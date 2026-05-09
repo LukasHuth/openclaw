@@ -26,7 +26,7 @@ export type SandboxBackendCommandResult = {
 export type SandboxFsBridgeContext = {
   workspaceDir: string;
   agentWorkspaceDir: string;
-  workspaceAccess: "none" | "ro" | "rw";
+  workspaceAccess: "none" | "ro" | "rw" | "volume";
   containerName: string;
   containerWorkdir: string;
   docker: {

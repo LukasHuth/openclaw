@@ -12,6 +12,10 @@ import {
   execDocker,
   execDockerRaw,
 } from "./docker.js";
+import {
+  createRemoteShellSandboxFsBridge,
+  type RemoteShellSandboxHandle,
+} from "./remote-fs-bridge.js";
 
 function resolveConfiguredDockerRuntimeImage(params: {
   config: CreateSandboxBackendParams["cfg"] | import("../../config/config.js").OpenClawConfig;
@@ -43,6 +47,7 @@ export async function createDockerSandboxBackend(
     workdir: params.cfg.docker.workdir,
     env: params.cfg.docker.env,
     image: params.cfg.docker.image,
+    useRemoteFsBridge: params.cfg.workspaceAccess === "volume",
   });
 }
 
@@ -51,8 +56,9 @@ function createDockerSandboxBackendHandle(params: {
   workdir: string;
   env?: Record<string, string>;
   image: string;
-}): SandboxBackendHandle {
-  return {
+  useRemoteFsBridge: boolean;
+}): SandboxBackendHandle & RemoteShellSandboxHandle {
+  const handle: SandboxBackendHandle & RemoteShellSandboxHandle = {
     id: "docker",
     runtimeId: params.containerName,
     runtimeLabel: params.containerName,
@@ -85,7 +91,23 @@ function createDockerSandboxBackendHandle(params: {
         ...command,
       });
     },
+    remoteWorkspaceDir: params.workdir,
+    remoteAgentWorkspaceDir: "/agent",
+    runRemoteShellScript(command) {
+      return runDockerSandboxShellCommand({
+        containerName: params.containerName,
+        ...command,
+      });
+    },
   };
+  if (params.useRemoteFsBridge) {
+    handle.createFsBridge = ({ sandbox }) =>
+      createRemoteShellSandboxFsBridge({
+        sandbox,
+        runtime: handle,
+      });
+  }
+  return handle;
 }
 
 export function runDockerSandboxShellCommand(

@@ -217,7 +217,7 @@ export type EmbeddedSandboxInfo = {
   enabled: boolean;
   workspaceDir?: string;
   containerWorkspaceDir?: string;
-  workspaceAccess?: "none" | "ro" | "rw";
+  workspaceAccess?: "none" | "ro" | "rw" | "volume";
   agentWorkspaceMount?: string;
   browserBridgeUrl?: string;
   hostBrowserAllowed?: boolean;
