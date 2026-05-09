@@ -6,6 +6,7 @@ import type {
   SandboxBackendManager,
 } from "./backend.types.js";
 import { resolveSandboxConfigForAgent } from "./config.js";
+import { SANDBOX_AGENT_WORKSPACE_MOUNT } from "./constants.js";
 import {
   dockerContainerState,
   ensureSandboxContainer,
@@ -57,8 +58,8 @@ function createDockerSandboxBackendHandle(params: {
   env?: Record<string, string>;
   image: string;
   useRemoteFsBridge: boolean;
-}): SandboxBackendHandle & RemoteShellSandboxHandle {
-  const handle: SandboxBackendHandle & RemoteShellSandboxHandle = {
+}): SandboxBackendHandle {
+  const handle: SandboxBackendHandle = {
     id: "docker",
     runtimeId: params.containerName,
     runtimeLabel: params.containerName,
@@ -91,20 +92,22 @@ function createDockerSandboxBackendHandle(params: {
         ...command,
       });
     },
-    remoteWorkspaceDir: params.workdir,
-    remoteAgentWorkspaceDir: "/agent",
-    runRemoteShellScript(command) {
-      return runDockerSandboxShellCommand({
-        containerName: params.containerName,
-        ...command,
-      });
-    },
   };
   if (params.useRemoteFsBridge) {
+    const remoteHandle: RemoteShellSandboxHandle = {
+      remoteWorkspaceDir: params.workdir,
+      remoteAgentWorkspaceDir: SANDBOX_AGENT_WORKSPACE_MOUNT,
+      runRemoteShellScript(command) {
+        return runDockerSandboxShellCommand({
+          containerName: params.containerName,
+          ...command,
+        });
+      },
+    };
     handle.createFsBridge = ({ sandbox }) =>
       createRemoteShellSandboxFsBridge({
         sandbox,
-        runtime: handle,
+        runtime: remoteHandle,
       });
   }
   return handle;

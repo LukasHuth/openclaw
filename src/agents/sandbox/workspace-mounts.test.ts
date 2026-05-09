@@ -18,6 +18,7 @@ describe("appendWorkspaceMountArgs", () => {
       agentWorkspaceDir: "/tmp/agent-workspace",
       workdir: "/workspace",
       workspaceAccess: access,
+      workspaceVolume: access === "volume" ? "openclaw-sandbox-workspace" : undefined,
     });
 
     expect(args).toContain(expected);

@@ -3,6 +3,13 @@ import type { SandboxWorkspaceAccess } from "./types.js";
 
 export const SANDBOX_MOUNT_FORMAT_VERSION = 2;
 
+export function resolveSandboxWorkspaceVolumeName(params: {
+  containerName: string;
+  workspaceVolume?: string;
+}): string {
+  return params.workspaceVolume?.trim() || `${params.containerName}-workspace`;
+}
+
 function formatManagedWorkspaceBind(params: {
   hostPath: string;
   containerPath: string;
@@ -23,7 +30,12 @@ export function appendWorkspaceMountArgs(params: {
     params;
 
   if (workspaceAccess === "volume") {
-    const volumeName = workspaceVolume?.trim() || "openclaw-sandbox-workspace";
+    const volumeName = workspaceVolume?.trim();
+    if (!volumeName) {
+      throw new Error(
+        'sandbox.workspaceAccess is set to "volume" but no workspace volume name was resolved. Configure sandbox.docker.workspaceVolume (or workspace-volume), or let OpenClaw derive a default container-based volume name.',
+      );
+    }
     args.push("--mount", `type=volume,source=${volumeName},target=${workdir}`);
     return;
   }

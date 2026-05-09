@@ -47,7 +47,11 @@ import { resolveSandboxAgentId, slugifySessionKey } from "./shared.js";
 import { isToolAllowed } from "./tool-policy.js";
 import type { SandboxBrowserContext, SandboxConfig } from "./types.js";
 import { validateNetworkMode } from "./validate-sandbox-security.js";
-import { appendWorkspaceMountArgs, SANDBOX_MOUNT_FORMAT_VERSION } from "./workspace-mounts.js";
+import {
+  appendWorkspaceMountArgs,
+  resolveSandboxWorkspaceVolumeName,
+  SANDBOX_MOUNT_FORMAT_VERSION,
+} from "./workspace-mounts.js";
 
 const HOT_BROWSER_WINDOW_MS = 5 * 60 * 1000;
 const CDP_SOURCE_RANGE_ENV_KEY = "OPENCLAW_BROWSER_CDP_SOURCE_RANGE";
@@ -178,7 +182,7 @@ export async function ensureSandboxBrowser(params: {
   const slug = params.cfg.scope === "shared" ? "shared" : slugifySessionKey(params.scopeKey);
   const name = `${params.cfg.browser.containerPrefix}${slug}`;
   const containerName = name.slice(0, 63);
-  const mainSandboxContainerName = `${params.cfg.docker.containerPrefix}${slug}`.slice(0, 63);
+  const dockerSandboxContainerName = `${params.cfg.docker.containerPrefix}${slug}`.slice(0, 63);
   const state = await dockerContainerState(containerName);
   const browserImage = params.cfg.browser.image ?? DEFAULT_SANDBOX_BROWSER_IMAGE;
   const cdpSourceRange = normalizeOptionalString(params.cfg.browser.cdpSourceRange);
@@ -308,7 +312,10 @@ export async function ensureSandboxBrowser(params: {
       workspaceAccess: params.cfg.workspaceAccess,
       workspaceVolume:
         params.cfg.workspaceAccess === "volume"
-          ? params.cfg.docker.workspaceVolume?.trim() || `${mainSandboxContainerName}-workspace`
+          ? resolveSandboxWorkspaceVolumeName({
+              containerName: dockerSandboxContainerName,
+              workspaceVolume: params.cfg.docker.workspaceVolume,
+            })
           : undefined,
     });
     if (browserDockerCfg.binds?.length) {

@@ -171,7 +171,11 @@ import { readRegistryEntry, updateRegistry } from "./registry.js";
 import { resolveSandboxAgentId, resolveSandboxScopeKey, slugifySessionKey } from "./shared.js";
 import type { SandboxConfig, SandboxDockerConfig, SandboxWorkspaceAccess } from "./types.js";
 import { validateSandboxSecurity } from "./validate-sandbox-security.js";
-import { appendWorkspaceMountArgs, SANDBOX_MOUNT_FORMAT_VERSION } from "./workspace-mounts.js";
+import {
+  appendWorkspaceMountArgs,
+  resolveSandboxWorkspaceVolumeName,
+  SANDBOX_MOUNT_FORMAT_VERSION,
+} from "./workspace-mounts.js";
 
 const log = createSubsystemLogger("docker");
 
@@ -525,7 +529,10 @@ async function createSandboxContainer(params: {
     workspaceAccess: params.workspaceAccess,
     workspaceVolume:
       params.workspaceAccess === "volume"
-        ? cfg.workspaceVolume?.trim() || `${name}-workspace`
+        ? resolveSandboxWorkspaceVolumeName({
+            containerName: name,
+            workspaceVolume: cfg.workspaceVolume,
+          })
         : undefined,
   });
   appendCustomBinds(args, cfg);
